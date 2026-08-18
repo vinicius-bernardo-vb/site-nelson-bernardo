@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase, formatPrice, whatsappLink } from '../lib/supabase'
+import { AMENITIES } from '../lib/amenities'
 
 export default function PropertyDetail() {
   const { id } = useParams()
@@ -59,12 +60,16 @@ export default function PropertyDetail() {
       </Link>
 
       <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-[1.3fr_1fr]">
-        <div>
-          <div className="corner-brackets aspect-[4/3] overflow-hidden rounded-sm bg-lightblue">
+        <div className="min-w-0">
+          <div className="corner-brackets flex h-[500px] items-center justify-center overflow-hidden rounded-sm bg-lightblue">
             {fotos.length > 0 ? (
-              <img src={fotos[activePhoto]} alt={imovel.titulo} className="h-full w-full object-cover" />
+              <img
+                src={fotos[activePhoto]}
+                alt={imovel.titulo}
+                className="h-full w-full object-contain"
+              />
             ) : (
-              <div className="flex h-full items-center justify-center text-muted">Sem fotos</div>
+              <div className="flex h-64 items-center justify-center text-muted">Sem fotos</div>
             )}
           </div>
           {fotos.length > 1 && (
@@ -97,7 +102,7 @@ export default function PropertyDetail() {
             {imovel.cidade || 'São Paulo'}
           </p>
 
-          <p className="mt-5 font-display text-3xl font-semibold text-blueaccent">
+          <p className="mt-5 font-body text-3xl font-semibold text-blueaccent">
             {formatPrice(imovel.preco)}
           </p>
 
@@ -106,6 +111,12 @@ export default function PropertyDetail() {
               <div className="rounded-sm border border-navy/10 bg-lightblue px-4 py-3">
                 <p className="text-muted">Quartos</p>
                 <p className="font-semibold text-navy">{imovel.quartos}</p>
+              </div>
+            ) : null}
+            {imovel.suites ? (
+              <div className="rounded-sm border border-navy/10 bg-lightblue px-4 py-3">
+                <p className="text-muted">Suítes</p>
+                <p className="font-semibold text-navy">{imovel.suites}</p>
               </div>
             ) : null}
             {imovel.banheiros ? (
@@ -132,6 +143,20 @@ export default function PropertyDetail() {
             <p className="mt-6 whitespace-pre-line text-sm leading-relaxed text-ink/80">
               {imovel.descricao}
             </p>
+          )}
+
+          {imovel.comodidades?.length > 0 && (
+            <div className="mt-6 border-t border-navy/10 pt-6">
+              <h2 className="font-display text-lg font-semibold text-navy">O que esse imóvel oferece</h2>
+              <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+                {AMENITIES.filter((item) => imovel.comodidades.includes(item.key)).map((item) => (
+                  <div key={item.key} className="flex items-center gap-2 text-ink">
+                    <span aria-hidden="true">{item.icon}</span>
+                    <span>{item.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
 
           <a

@@ -13,9 +13,12 @@ export function whatsappLink(message) {
 
 export function formatPrice(value) {
   if (value === null || value === undefined) return 'Consulte'
+  // preco é salvo em milhares de reais (ex: 484 = R$ 484.000)
+  const valueInReais = Math.round(value * 1000 * 100) / 100
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
-    maximumFractionDigits: 0,
-  }).format(value)
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(valueInReais)
 }

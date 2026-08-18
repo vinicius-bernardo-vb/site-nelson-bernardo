@@ -42,7 +42,7 @@ export default function PropertyCard({ imovel }) {
           {imovel.cidade || 'São Paulo'}
         </p>
 
-        <p className="mt-3 font-display text-xl font-semibold text-blueaccent">
+        <p className="mt-3 font-body text-xl font-semibold text-blueaccent">
           {formatPrice(imovel.preco)}
         </p>
 

@@ -12,7 +12,7 @@ export default {
         muted: "#5b6b78",
       },
       fontFamily: {
-        display: ["'Playfair Display'", "Georgia", "serif"],
+        display: ["Poppins", "system-ui", "sans-serif"],
         body: ["Inter", "system-ui", "sans-serif"],
       },
     },

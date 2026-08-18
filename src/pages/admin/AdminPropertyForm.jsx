@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { AMENITIES } from '../../lib/amenities'
 
 const EMPTY = {
   titulo: '',
@@ -11,12 +12,14 @@ const EMPTY = {
   preco: '',
   descricao: '',
   quartos: '',
+  suites: '',
   banheiros: '',
   vagas: '',
   area_m2: '',
   destaque: false,
   ativo: true,
   fotos: [],
+  comodidades: [],
 }
 
 export default function AdminPropertyForm() {
@@ -35,7 +38,7 @@ export default function AdminPropertyForm() {
     async function load() {
       const { data, error } = await supabase.from('imoveis').select('*').eq('id', id).single()
       if (!error && data) {
-        setForm({ ...EMPTY, ...data })
+        setForm({ ...EMPTY, ...data, comodidades: data.comodidades || [] })
       }
       setLoading(false)
     }
@@ -44,6 +47,15 @@ export default function AdminPropertyForm() {
 
   function updateField(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }))
+  }
+
+  function toggleAmenity(key) {
+    setForm((prev) => ({
+      ...prev,
+      comodidades: prev.comodidades.includes(key)
+        ? prev.comodidades.filter((k) => k !== key)
+        : [...prev.comodidades, key],
+    }))
   }
 
   async function handlePhotoUpload(e) {
@@ -92,12 +104,14 @@ export default function AdminPropertyForm() {
       preco: form.preco ? Number(form.preco) : null,
       descricao: form.descricao,
       quartos: form.quartos ? Number(form.quartos) : null,
+      suites: form.suites ? Number(form.suites) : null,
       banheiros: form.banheiros ? Number(form.banheiros) : null,
       vagas: form.vagas ? Number(form.vagas) : null,
       area_m2: form.area_m2 ? Number(form.area_m2) : null,
       destaque: form.destaque,
       ativo: form.ativo,
       fotos: form.fotos,
+      comodidades: form.comodidades,
     }
 
     const query = isEditing
@@ -208,6 +222,16 @@ export default function AdminPropertyForm() {
             </div>
 
             <div>
+              <label className="block text-sm font-medium text-ink">Suítes</label>
+              <input
+                type="number"
+                value={form.suites}
+                onChange={(e) => updateField('suites', e.target.value)}
+                className="mt-1 w-full rounded-sm border border-navy/20 px-3 py-2.5 text-sm focus:border-blueaccent"
+              />
+            </div>
+
+            <div>
               <label className="block text-sm font-medium text-ink">Banheiros</label>
               <input
                 type="number"
@@ -265,6 +289,23 @@ export default function AdminPropertyForm() {
               />
               Ativo (visível no site)
             </label>
+          </div>
+        </div>
+
+        <div className="rounded-sm border border-navy/10 bg-white p-6">
+          <label className="block text-sm font-medium text-ink">Comodidades</label>
+          <p className="mt-1 text-xs text-muted">Marque o que o imóvel tem. Só o que for marcado aparece na página do imóvel.</p>
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {AMENITIES.map((item) => (
+              <label key={item.key} className="flex items-center gap-2 text-sm text-ink">
+                <input
+                  type="checkbox"
+                  checked={form.comodidades.includes(item.key)}
+                  onChange={() => toggleAmenity(item.key)}
+                />
+                <span>{item.icon} {item.label}</span>
+              </label>
+            ))}
           </div>
         </div>
 
