@@ -62,16 +62,14 @@ export default function Home() {
         <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-5 py-16 sm:py-20 md:grid-cols-[1.1fr_0.9fr]">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-gold">
-              CRECI-SP 326665 · São Paulo
+              CRECI-SP 326665-F · São Paulo
             </p>
             <h1 className="mt-4 font-display text-4xl font-semibold italic leading-tight text-white sm:text-5xl">
-              Imóveis selecionados,
-              <br />
-              atendimento direto.
+              Imóveis Exclusivos
             </h1>
             <p className="mt-5 max-w-md text-sm leading-relaxed text-white/75 sm:text-base">
-              Cada imóvel abaixo foi selecionado pessoalmente por Nelson Bernardo Júnior.
-              Encontrou algo que te interessa? É um clique de distância do WhatsApp dele.
+              Atendimento personalizado, especialista na região da zona norte trago o que
+              tem de melhor para você.
             </p>
           </div>
           <div className="corner-brackets mx-auto aspect-square w-48 overflow-hidden rounded-full border-2 border-gold sm:w-60">

@@ -5,7 +5,7 @@ export default function Footer() {
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
           <div>
             <p className="font-display text-lg italic text-navy">Nelson Bernardo Júnior</p>
-            <p className="text-sm text-muted">Corretor de Imóveis · CRECI-SP 326665</p>
+            <p className="text-sm text-muted">Corretor de Imóveis · CRECI-SP 326665-F</p>
           </div>
           <a
             href="https://www.instagram.com/nelsonbernardo/"
