@@ -110,6 +110,7 @@ export default function AdminDashboard() {
                     <td className="px-4 py-3 text-muted">{imovel.bairro || '—'}</td>
                     <td className="px-4 py-3 text-muted">{formatPrice(imovel.preco)}</td>
                     <td className="px-4 py-3">
+                      <span className={`mb-2 block text-xs font-semibold ${imovel.vendido ? 'text-red-700' : 'text-green-700'}`}>{imovel.vendido ? 'Vendido' : 'Disponível'}</span>
                       <button
                         onClick={() => toggleAtivo(imovel)}
                         className={`rounded-full px-3 py-1 text-xs font-semibold ${

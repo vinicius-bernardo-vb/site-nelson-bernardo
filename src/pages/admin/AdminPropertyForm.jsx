@@ -18,6 +18,7 @@ const EMPTY = {
   area_m2: '',
   destaque: false,
   ativo: true,
+  vendido: false,
   fotos: [],
   comodidades: [],
 }
@@ -90,6 +91,36 @@ export default function AdminPropertyForm() {
     setForm((prev) => ({ ...prev, fotos: prev.fotos.filter((f) => f !== url) }))
   }
 
+  async function deleteExtraPhotos() {
+    if (!confirm('Excluir permanentemente todas as fotos extras? Apenas a primeira foto (capa) será mantida.')) return
+    setSaving(true)
+    setError(null)
+    try {
+      const { data, error: loadError } = await supabase.from('imoveis').select('fotos, vendido').eq('id', id).single()
+      if (loadError) throw loadError
+      if (!data.vendido) throw new Error('Salve o imóvel como vendido antes de excluir as fotos extras.')
+      const photos = data.fotos || []
+      const baseUrl = supabase.storage.from('imoveis-fotos').getPublicUrl('').data.publicUrl
+      const extras = [...new Set(photos.slice(1).filter((url) => url !== photos[0]))]
+      const paths = extras.map((url) => {
+        if (!url.startsWith(baseUrl)) throw new Error('Há fotos fora do armazenamento deste projeto. A exclusão foi cancelada.')
+        return decodeURIComponent(url.slice(baseUrl.length))
+      })
+      if (paths.length) {
+        const { error: removeError } = await supabase.storage.from('imoveis-fotos').remove(paths)
+        if (removeError) throw removeError
+      }
+      const cover = photos.slice(0, 1)
+      const { error: updateError } = await supabase.from('imoveis').update({ fotos: cover }).eq('id', id)
+      if (updateError) throw updateError
+      updateField('fotos', cover)
+    } catch (err) {
+      setError(`Não foi possível concluir a limpeza: ${err.message}. Você pode tentar novamente.`)
+    } finally {
+      setSaving(false)
+    }
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     setSaving(true)
@@ -110,6 +141,7 @@ export default function AdminPropertyForm() {
       area_m2: form.area_m2 ? Number(form.area_m2) : null,
       destaque: form.destaque,
       ativo: form.ativo,
+      vendido: form.vendido,
       fotos: form.fotos,
       comodidades: form.comodidades,
     }
@@ -272,7 +304,7 @@ export default function AdminPropertyForm() {
             </div>
           </div>
 
-          <div className="mt-4 flex gap-6">
+          <div className="mt-4 flex flex-wrap gap-6">
             <label className="flex items-center gap-2 text-sm text-ink">
               <input
                 type="checkbox"
@@ -289,7 +321,12 @@ export default function AdminPropertyForm() {
               />
               Ativo (visível no site)
             </label>
+            <label className="flex items-center gap-2 text-sm text-ink">
+              <input type="checkbox" checked={form.vendido} onChange={(e) => updateField('vendido', e.target.checked)} />
+              Vendido
+            </label>
           </div>
+          {form.vendido && <p className="mt-3 text-sm text-muted">O site exibirá o selo Vendido e apenas a capa. Mantenha Ativo marcado para continuar visível.</p>}
         </div>
 
         <div className="rounded-sm border border-navy/10 bg-white p-6">
@@ -311,24 +348,32 @@ export default function AdminPropertyForm() {
 
         <div className="rounded-sm border border-navy/10 bg-white p-6">
           <label className="block text-sm font-medium text-ink">Fotos</label>
+          <p className="mt-1 text-xs text-muted">A primeira foto é a capa.</p>
+          {isEditing && form.vendido && form.fotos?.length > 1 && (
+            <button type="button" disabled={saving || uploading} onClick={deleteExtraPhotos} className="mt-3 block text-sm font-semibold text-red-700 disabled:opacity-50">
+              Excluir fotos extras e manter a capa
+            </button>
+          )}
           <input
             type="file"
             accept="image/*"
             multiple
             onChange={handlePhotoUpload}
-            disabled={uploading}
+            disabled={uploading || saving || form.vendido}
             className="mt-2 block text-sm"
           />
           {uploading && <p className="mt-2 text-sm text-muted">Enviando fotos...</p>}
 
           {form.fotos?.length > 0 && (
             <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
-              {form.fotos.map((url) => (
+              {form.fotos.map((url, index) => (
                 <div key={url} className="group relative aspect-square overflow-hidden rounded-sm border border-navy/10">
                   <img src={url} alt="" className="h-full w-full object-cover" />
+                  {index === 0 && <span className="absolute bottom-1 left-1 rounded bg-navy px-2 py-1 text-xs text-white">Capa</span>}
                   <button
                     type="button"
                     onClick={() => removePhoto(url)}
+                    disabled={saving || uploading}
                     className="absolute right-1 top-1 rounded-full bg-red-600 px-2 py-0.5 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100"
                   >
                     Remover

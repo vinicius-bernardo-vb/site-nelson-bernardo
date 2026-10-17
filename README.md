@@ -69,3 +69,19 @@ src/
 - `/admin` — dashboard (protegido)
 - `/admin/imoveis/novo` — cadastrar imóvel (protegido)
 - `/admin/imoveis/:id` — editar imóvel (protegido)
+
+## Imóveis vendidos
+
+Antes de usar a funcionalidade, execute no SQL Editor do Supabase o arquivo
+`supabase/migrations/202610160001_add_vendido.sql`.
+
+No painel, edite o imóvel, marque **Vendido** e salve. Mantenha **Ativo** para
+continuar exibindo o anúncio com o selo Vendido. Cards e detalhes exibem a capa
+e direcionam o contato para outros imóveis disponíveis.
+
+Depois de salvar como vendido, abra novamente a edição e clique em
+**Excluir fotos extras e manter a capa**. A exclusão pede confirmação e remove
+os arquivos do bucket `imoveis-fotos`, preservando a primeira foto. Desmarcar
+Vendido não recupera fotos excluídas. A sessão administrativa precisa ter
+permissão SELECT e DELETE nesse bucket nas políticas do Supabase Storage.
+Se a limpeza falhar, a mensagem permite tentar novamente.
