@@ -48,9 +48,11 @@ export default function PropertyDetail() {
     )
   }
 
-  const fotos = imovel.fotos?.length ? imovel.fotos : []
+  const fotos = imovel.vendido ? (imovel.fotos || []).slice(0, 1) : (imovel.fotos || [])
   const link = whatsappLink(
-    `Olá Nelson, tenho interesse no imóvel: ${imovel.titulo} - ${imovel.bairro || imovel.endereco || ''}`
+    imovel.vendido
+      ? 'Olá Nelson, gostaria de conhecer outros imóveis disponíveis.'
+      : `Olá Nelson, tenho interesse no imóvel: ${imovel.titulo} - ${imovel.bairro || imovel.endereco || ''}`
   )
 
   return (
@@ -64,7 +66,7 @@ export default function PropertyDetail() {
           <div className="corner-brackets flex h-[500px] items-center justify-center overflow-hidden rounded-sm bg-lightblue">
             {fotos.length > 0 ? (
               <img
-                src={fotos[activePhoto]}
+                src={fotos[activePhoto] || fotos[0]}
                 alt={imovel.titulo}
                 className="h-full w-full object-contain"
               />
@@ -90,7 +92,8 @@ export default function PropertyDetail() {
         </div>
 
         <div>
-          {imovel.destaque && (
+          {imovel.vendido && <p className="rounded-sm bg-red-50 px-4 py-3 font-semibold text-red-700">Vendido — este imóvel já foi vendido.</p>}
+          {imovel.destaque && !imovel.vendido && (
             <span className="inline-block rounded-full bg-gold px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-navy">
               Destaque
             </span>
@@ -165,7 +168,7 @@ export default function PropertyDetail() {
             rel="noopener noreferrer"
             className="mt-8 flex w-full items-center justify-center rounded-sm border border-navy bg-navy py-3.5 text-sm font-semibold text-white transition-colors hover:bg-blueaccent"
           >
-            Falar no WhatsApp sobre este imóvel
+            {imovel.vendido ? 'Consultar outros imóveis no WhatsApp' : 'Falar no WhatsApp sobre este imóvel'}
           </a>
         </div>
       </div>

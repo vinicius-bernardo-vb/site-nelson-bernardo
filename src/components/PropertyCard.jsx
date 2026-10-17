@@ -4,7 +4,9 @@ import { formatPrice, whatsappLink } from '../lib/supabase'
 export default function PropertyCard({ imovel }) {
   const capa = imovel.fotos?.[0]
   const link = whatsappLink(
-    `Olá Nelson, tenho interesse no imóvel: ${imovel.titulo} - ${imovel.bairro || imovel.endereco || ''}`
+    imovel.vendido
+      ? 'Olá Nelson, gostaria de conhecer outros imóveis disponíveis.'
+      : `Olá Nelson, tenho interesse no imóvel: ${imovel.titulo} - ${imovel.bairro || imovel.endereco || ''}`
   )
 
   return (
@@ -23,7 +25,10 @@ export default function PropertyCard({ imovel }) {
               Sem foto
             </div>
           )}
-          {imovel.destaque && (
+          {imovel.vendido && (
+            <span className="absolute left-3 top-3 rounded-full bg-red-700 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white">Vendido</span>
+          )}
+          {imovel.destaque && !imovel.vendido && (
             <span className="absolute left-3 top-3 rounded-full bg-gold px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-navy">
               Destaque
             </span>
@@ -60,7 +65,7 @@ export default function PropertyCard({ imovel }) {
           onClick={(e) => e.stopPropagation()}
           className="mt-4 flex w-full items-center justify-center rounded-sm border border-navy bg-navy py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blueaccent"
         >
-          Falar no WhatsApp
+          {imovel.vendido ? 'Consultar outros imóveis' : 'Falar no WhatsApp'}
         </a>
       </div>
     </div>
